@@ -33,6 +33,7 @@ export const applicationLogOption: LogOptionByEnv = {
     transports: [
       new transports.Console({
         format: devFormat,
+        level: 'silly',
       }),
     ],
   },
@@ -42,6 +43,7 @@ export const applicationLogOption: LogOptionByEnv = {
         ...logRotateOption,
         filename: 'app-%DATE%',
         format: prodFormat,
+        level: 'info',
       }),
     ],
   },
@@ -55,6 +57,7 @@ export const accessLogOption: LogOptionByEnv = {
     transports: [
       new transports.Console({
         format: devFormat,
+        level: 'silly',
       }),
     ],
   },
@@ -64,6 +67,7 @@ export const accessLogOption: LogOptionByEnv = {
         ...logRotateOption,
         filename: 'access-%DATE%',
         format: prodFormat,
+        level: 'info',
       }),
     ],
   },
