@@ -1,5 +1,5 @@
 name: CI
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -44,14 +44,3 @@ jobs:
       run: yarn --frozen-lockfile
     - run: yarn lint
     - run: yarn build
-    - name: Change slack notification status on failure
-      if: ${{ !success() }}
-      run: echo "::set-env name=SLACK_COLOR::#cb2431"
-    - name: Slack notification
-      if: always()
-      uses: rtCamp/action-slack-notify@v2.0.2
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_CI }}
-        SLACK_USERNAME: GitHub Actions
-        SLACK_ICON: https://avatars0.githubusercontent.com/u/44036562
-
