@@ -1,14 +1,7 @@
 import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
-import { transports, format, LoggerOptions } from 'winston';
+import { transports, format } from 'winston';
 import 'winston-daily-rotate-file';
-
-/**
- * Winston format for production
- */
-interface LogOptionByEnv {
-  dev: LoggerOptions;
-  prod: LoggerOptions;
-}
+import { LogOptionByEnv } from './logger.interface';
 
 /**
  * Base option for log rotation

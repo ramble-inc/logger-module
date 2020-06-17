@@ -7,16 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { WinstonLogger } from 'nest-winston';
 import { createLogger, LoggerOptions } from 'winston';
-
-/**
- * Type for gRPC meta info in message.
- * Normally comes as the 2nd item of ExecutionContext.getArgs().
- */
-type GRPCMeta = {
-  _internal_repr: {
-    'user-agent': string[];
-  };
-};
+import { MetaData } from './logger.interface';
 
 /**
  * Interceptor to output access log.
@@ -35,7 +26,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const method = context.getHandler().name;
     const data = context.getArgByIndex<Record<string, unknown>>(0);
     // eslint-disable-next-line no-underscore-dangle
-    const userAgent = context.getArgByIndex<GRPCMeta>(1)._internal_repr[
+    const userAgent = context.getArgByIndex<MetaData>(1)._internal_repr[
       'user-agent'
     ];
 
