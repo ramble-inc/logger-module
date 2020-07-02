@@ -36,11 +36,11 @@
     "lint-staged": "^10.2.10",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.5.4",
+    "rxjs": "^6.6.0",
     "typescript": "^3.7.4"
   },
   "peerDependencies": {
     "@nestjs/common": "^7.0.0",
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.6.0"
   }
 }
