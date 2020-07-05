@@ -1,5 +1,6 @@
 import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import { transports, format } from 'winston';
+import { jest } from '@jest/globals';
 import 'winston-daily-rotate-file';
 import { LogOptionByEnv } from './logger.interface';
 
@@ -70,5 +71,28 @@ export const accessLogOption: LogOptionByEnv = {
         level: 'info',
       }),
     ],
+  },
+};
+
+export const winstonMock = {
+  format: {
+    colorize: jest.fn(),
+    combine: jest.fn(),
+    json: jest.fn(),
+    label: jest.fn(),
+    timestamp: jest.fn(),
+    printf: jest.fn(),
+  },
+  createLogger: jest.fn().mockReturnValue({
+    error: jest.fn(),
+    warn: jest.fn(),
+    info: jest.fn(),
+    http: jest.fn(),
+    verbose: jest.fn(),
+    debug: jest.fn(),
+    silly: jest.fn(),
+  }),
+  transports: {
+    Console: jest.fn(),
   },
 };
