@@ -27,7 +27,7 @@
     "winston-daily-rotate-file": "^4.5.0"
   },
   "devDependencies": {
-    "@nestjs/common": "^7.4.1",
+    "@nestjs/common": "^7.4.2",
     "@ramble-inc/eslint-config": "^0.0.2",
     "@ramble-inc/prettier-config": "^0.0.1",
     "@types/node": "^14.0.27",
@@ -40,7 +40,7 @@
     "typescript": "^3.9.7"
   },
   "peerDependencies": {
-    "@nestjs/common": "^7.4.1",
+    "@nestjs/common": "^7.4.2",
     "rxjs": "^6.6.2"
   }
 }
