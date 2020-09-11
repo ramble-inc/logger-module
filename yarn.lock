@@ -1404,10 +1404,10 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-nest-winston@^1.3.6:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/nest-winston/-/nest-winston-1.3.6.tgz#8b80ef387d883b7b2ce4f25a6d43584e76f5ccc4"
-  integrity sha512-KHff4iTEzoWyg5NRFlURbyhGT1gBG8khP1ehY4C0d3YJLHCGCdEQTgHCJq8OhC2IJHqJ60Osr2OI1pzKn6tHww==
+nest-winston@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/nest-winston/-/nest-winston-1.4.0.tgz#fa6e540113703eefab316b7845c9ff8aac2a7d6f"
+  integrity sha512-gPIu+zIfhUKMYUQbeoEQgaI78zgIru47ZTZJQbvN7VUUK9CiAKUhd6u0X/v8jy5YIj9j4yoswARjC5yvkXhw2g==
   dependencies:
     cli-color "^2.0.0"
     fast-safe-stringify "^2.0.7"

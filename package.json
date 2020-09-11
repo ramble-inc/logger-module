@@ -22,7 +22,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "nest-winston": "^1.3.6",
+    "nest-winston": "^1.4.0",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.5.0"
   },
