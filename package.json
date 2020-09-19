@@ -30,7 +30,7 @@
     "@nestjs/common": "^7.4.4",
     "@ramble-inc/eslint-config": "^0.0.2",
     "@ramble-inc/prettier-config": "^0.0.1",
-    "@types/node": "^14.10.0",
+    "@types/node": "^14.11.1",
     "eslint": "^7.9.0",
     "husky": "^4.3.0",
     "lint-staged": "^10.4.0",
