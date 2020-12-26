@@ -1,22 +1,40 @@
 import { devOption } from '@/logger/logger.constants';
-import pino, { Logger } from 'pino';
+import { LoggerService } from '@/logger/logger.service';
 
 describe('LoggerService', () => {
-  let logger: Logger;
+  let logger: LoggerService;
 
   beforeAll(() => {
-    logger = pino(devOption);
+    logger = new LoggerService(devOption);
   });
 
-  it('should be defined', () => {
-    logger.log({
-      msg: 'message',
-      timestampDiff: '368',
-    });
+  it('should log string', () => {
+    const message = 'message';
+    logger.log(message);
+    logger.info(message);
+    logger.error(message);
+    logger.warn(message);
+    logger.debug(message);
+    logger.verbose(message);
 
-    const childLogger = logger.child({ context: 'cccc' });
-    childLogger.error('error error');
-    childLogger.debug({ key: 'asdf' });
+    expect(logger).toBeDefined();
+  });
+
+  it('should log object', () => {
+    const message = { a: '123', b: 123 };
+    logger.log(message);
+    logger.info(message);
+    logger.error(message);
+    logger.warn(message);
+    logger.debug(message);
+    logger.verbose(message);
+
+    expect(logger).toBeDefined();
+  });
+
+  it('should log error', () => {
+    const message = new Error('something went wrong');
+    logger.error(message);
 
     expect(logger).toBeDefined();
   });

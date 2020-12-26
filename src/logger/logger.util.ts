@@ -1,46 +1,56 @@
 import { clc } from '@nestjs/common/utils/cli-colors.util';
 import { isObject } from '@nestjs/common/utils/shared.utils';
+import { format } from 'winston';
+import { Format } from 'logform';
 import {
-  LOG_LEVEL_SWAPPED,
   NEST_COLOR_SCHEMA,
+  LOCALE_STRING_OPTIONS,
 } from '@/logger/logger.constants';
 import type {
-  InputData,
-  NestPrettyPrintOption,
+  NestJsFormatterOption,
+  NestJsFormatInfo,
 } from '@/logger/logger.interface';
+
+/**
+ * Remove the frist line from stack trace to get pure stack trace
+ *
+ * @param stackTrace
+ */
+export const getStackTrace = (stackTrace: string): string => {
+  const lines = stackTrace.split('\n');
+  lines.splice(0, 1);
+  return lines.join('\n');
+};
 
 /**
  * NestJS like prettifier
  *
  * @param param0
  */
-export const nestPrettifier = ({
+export const nestJs = ({
   colorSchema = NEST_COLOR_SCHEMA,
-}: NestPrettyPrintOption): ((inputData: InputData) => string) => {
-  return ({
-    level,
-    time,
-    pid,
-    hostname, // eslint-disable-line @typescript-eslint/no-unused-vars
-    context,
-    msg,
-    stack,
-  }: InputData): string => {
-    const logLevel = LOG_LEVEL_SWAPPED[level];
-    const color = colorSchema[logLevel];
+  appName = 'Nest',
+}: NestJsFormatterOption): Format =>
+  format.printf(({ level, message, context, stack }: NestJsFormatInfo) => {
+    const color = colorSchema[level] as (msg: string) => string;
 
     let output = '';
-    if (logLevel === 'error' && stack) {
-      output = stack;
-    } else if (isObject(msg)) {
-      output = `${color('Object:')}\n${JSON.stringify(msg, null, 2)}`;
+    if (isObject(message)) {
+      output = `${color('Object:')}\n${JSON.stringify(message, null, 2)}`;
     } else {
-      output = color(msg);
+      output = color(message);
     }
 
-    const pidMessage = color(`[Nest] ${pid}   - `);
-    const contextMessage = context ? clc.yellow(`[${context}] `) : '';
+    const pidMessage = color(`[${appName}] ${process.pid}   - `);
+    const timestamp = new Date().toLocaleString(
+      undefined,
+      LOCALE_STRING_OPTIONS,
+    );
+    const contextMessage = clc.yellow(`[${context || 'LoggerService'}] `);
+    const stackTrace =
+      level === 'error' && stack != null ? `\n${getStackTrace(stack)}` : '';
 
-    return `${pidMessage}${time}   ${contextMessage}${color(`${output}`)}\n`;
-  };
-};
+    return `${pidMessage}${timestamp}   ${contextMessage}${color(
+      `${output}`,
+    )}${stackTrace}`;
+  });

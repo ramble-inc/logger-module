@@ -1,47 +1,30 @@
-import type { ValuesType } from 'utility-types';
-import { NEST_LOG_LEVEL } from '@/logger/logger.constants';
+import { TransformableInfo } from 'logform';
 
 /**
- * Custom prettyPrint option
+ * Type for color function
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export type NestPrettyPrintOption = {
-  colorSchema: {
-    verbose: (text: string) => string;
-    debug: (text: string) => string;
-    warn: (text: string) => string;
-    error: (text: string) => string;
-    log: (text: string) => string;
-  };
-};
+export type Colorizer = (text: string) => string;
 
 /**
- * Type for pino.LoggerOptions.prettyPrint
+ * Type for color schema
  */
-export interface NestPrettifierOption {
-  prettyPrint: NestPrettyPrintOption;
+export interface ColorSchema {
+  [key: string]: Colorizer;
 }
 
 /**
- * Union type for log level text
+ * Type for NestJS formatter option
  */
-export type LogLevelLabel = keyof typeof NEST_LOG_LEVEL;
+export interface NestJsFormatterOption {
+  colorSchema: ColorSchema;
+  appName?: string;
+}
 
 /**
- * Uion type for log level number
+ * Type for NestFormatInfo
  */
-export type LogLevelNumber = ValuesType<typeof NEST_LOG_LEVEL>;
-
-/**
- * Type for nestPrettifier args
- */
-export interface InputData {
-  level: LogLevelNumber;
-  pid: string;
-  time: string;
-  hostname: string;
+export interface NestJsFormatInfo extends TransformableInfo {
   context: string;
-  msg: string | Record<string, unknown>;
   stack?: string;
 }
 

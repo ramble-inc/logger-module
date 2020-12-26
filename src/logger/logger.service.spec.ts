@@ -1,45 +1,65 @@
+import { devOption } from '@/logger/logger.constants';
 import { LoggerService } from '@/logger/logger.service';
-import { devOption, prodOption } from '@/logger/logger.constants';
 
 describe('LoggerService', () => {
-  describe('NestJS format', () => {
-    let service: LoggerService;
+  let logger: LoggerService;
 
-    beforeAll(() => {
-      service = new LoggerService(devOption);
-    });
-
-    it('log', () => {
-      service.error('dev');
-      service.error({ x: 123 });
-      service.error(new Error('eeeee'));
-      const child = service.setContext('asdf');
-      child.error('dev');
-      service.error('dev');
-      // service.error('dev');
-      // service.warn('dev');
-      // service.debug('dev');
-      // service.verbose('dev');
-      expect(service).toBeDefined();
-    });
+  beforeAll(() => {
+    logger = new LoggerService(devOption);
   });
 
-  describe('JSON format', () => {
-    let service: LoggerService;
+  it('should log string', () => {
+    const message = 'message';
+    logger.log(message);
+    logger.info(message);
+    logger.error(message);
+    logger.warn(message);
+    logger.debug(message);
+    logger.verbose(message);
 
-    beforeAll(() => {
-      service = new LoggerService(prodOption);
-    });
+    expect(logger).toBeDefined();
+  });
 
-    it('log', () => {
-      service.error('prod');
-      service.error({ x: 123 });
-      service.error(new Error('eeeee'));
-      // service.error('prod');
-      // service.warn('prod');
-      // service.debug('prod');
-      // service.verbose('prod');
-      expect(service).toBeDefined();
-    });
+  it('should log object', () => {
+    const message = { a: '123', b: 123 };
+    logger.log(message);
+    logger.info(message);
+    logger.error(message);
+    logger.warn(message);
+    logger.debug(message);
+    logger.verbose(message);
+
+    expect(logger).toBeDefined();
+  });
+
+  it('should log error', () => {
+    const message = new Error('something went wrong');
+    logger.error(message);
+
+    expect(logger).toBeDefined();
+  });
+
+  it('child logger should log', () => {
+    const childLogger = logger.child({ context: 'cccc' });
+    const message = 'message';
+    childLogger.log(message);
+    childLogger.info(message);
+    childLogger.error(message);
+    childLogger.warn(message);
+    childLogger.debug(message);
+    childLogger.verbose(message);
+
+    const obj = { a: '123', b: 123 };
+    childLogger.log(obj);
+    childLogger.info(obj);
+    childLogger.error(obj);
+    childLogger.warn(obj);
+    childLogger.debug(obj);
+    childLogger.verbose(obj);
+
+    const error = new Error('something went wrong');
+    logger.error(error);
+
+    expect(childLogger).toBeDefined();
   });
 });

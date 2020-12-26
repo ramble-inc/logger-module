@@ -1,7 +1,6 @@
 import { clc } from '@nestjs/common/utils/cli-colors.util';
-import type { LoggerOptions } from 'pino';
-import type { LogLevelLabel, LogLevelNumber } from '@/logger/logger.interface';
-import { nestPrettifier } from '@/logger/logger.util';
+import { transports, LoggerOptions, format } from 'winston';
+import { nestJs } from '@/logger/logger.util';
 
 /**
  * Provider token for global logger
@@ -24,91 +23,45 @@ export const LOCALE_STRING_OPTIONS = {
  * NestJS log level
  */
 export const NEST_LOG_LEVEL = {
-  verbose: 10,
-  debug: 20,
-  warn: 30,
-  error: 40,
-  log: 50,
-} as const;
-
-/**
- * NestJS log level(key <=> value)
- */
-export const LOG_LEVEL_SWAPPED = ((
-  obj: Record<LogLevelLabel, LogLevelNumber>,
-): Record<LogLevelNumber, LogLevelLabel> => {
-  const ret = {};
-  Object.entries(obj).forEach(([key, value]) => {
-    ret[value] = key;
-  });
-  return ret as Record<LogLevelNumber, LogLevelLabel>;
-})(NEST_LOG_LEVEL);
+  // log: 0,
+  info: 0,
+  error: 1,
+  warn: 2,
+  debug: 3,
+  verbose: 4,
+};
 
 /**
  * NestJS log color schema
  */
 export const NEST_COLOR_SCHEMA = {
-  verbose: clc.cyanBright,
-  debug: clc.magentaBright,
-  warn: clc.yellow,
+  // log: clc.green,
+  info: clc.green,
   error: clc.red,
-  log: clc.green,
-};
-
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
-
-/**
- * Common pino option
- */
-export const commonOption: LoggerOptions = {
-  // Define custom log level
-  customLevels: NEST_LOG_LEVEL,
-
-  // Exclude default pino log levels
-  useOnlyCustomLevels: true,
+  warn: clc.yellow,
+  debug: clc.magentaBright,
+  verbose: clc.cyanBright,
 };
 
 /**
- * Pino option for development
+ * Winston option for development
  */
 export const devOption: LoggerOptions = {
-  ...commonOption,
-
-  // set log level
+  levels: NEST_LOG_LEVEL,
   level: 'verbose',
-
-  // change timestamp format
-  timestamp: () =>
-    `,"time":"${new Date(Date.now()).toLocaleString(
-      undefined,
-      LOCALE_STRING_OPTIONS,
-    )}"`,
-
-  // option passed to custom prettifier
-  prettyPrint: {
-    colorSchema: NEST_COLOR_SCHEMA,
-  } as any,
-
-  // set custom prettifier
-  prettifier: nestPrettifier,
+  transports: [
+    new transports.Console({
+      format: format.combine(nestJs({ colorSchema: NEST_COLOR_SCHEMA })),
+    }),
+  ],
 };
 
 /**
- * Pino option for production
+ * Winston option for production
  */
 export const prodOption: LoggerOptions = {
-  ...commonOption,
-
-  // set log level
+  levels: NEST_LOG_LEVEL,
   level: 'error',
-
-  // change timestamp format
-  timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`,
-
-  // log log level as string intead of number
-  formatters: {
-    level(label: string): { level: string } {
-      return { level: label };
-    },
-  },
+  format: format.json(),
+  transports: [new transports.Console()],
 };

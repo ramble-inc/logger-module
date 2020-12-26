@@ -1,14 +1,15 @@
 import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
-import pino, { Logger, LoggerOptions } from 'pino';
-import { devOption } from '@/logger/logger.constants';
-import { LogLevelLabel } from '@/logger/logger.interface';
+import { createLogger, LeveledLogMethod, Logger, LoggerOptions } from 'winston';
 
 @Injectable()
 export class LoggerService implements NestLoggerService {
+  private option: LoggerOptions;
+
   private logger: Logger;
 
-  constructor(option: LoggerOptions = devOption) {
-    this.logger = pino(option);
+  constructor(option: LoggerOptions, logger?: Logger) {
+    this.option = option;
+    this.logger = logger || createLogger(option);
   }
 
   /**
@@ -17,41 +18,57 @@ export class LoggerService implements NestLoggerService {
    * @param name
    * @param message
    */
-  callFunction(
-    name: LogLevelLabel,
+  private callFunction(
+    name: string,
     message: string | Record<string, unknown>,
   ): void {
+    if (this.logger[name] == null) {
+      throw new Error(`logger.${name} is not implemented`);
+    }
     if (typeof message === 'string') {
-      this.logger[name]({ msg: message });
+      (this.logger[name] as LeveledLogMethod)({ message });
     } else if (typeof message === 'object') {
-      const { stack, ...rest } = message;
-      this.logger[name]({ msg: rest, stack });
+      (this.logger[name] as LeveledLogMethod)(message);
     }
   }
 
   /**
    * Output log log
+   * Alias to info log
    *
    * @param message
    */
-  log(message: string): void;
-  log(message: Record<string, unknown>): void;
-  log(message: string | Record<string, unknown>): void {
-    this.callFunction('log', message);
+  public log(message: string): void;
+  public log(message: Record<string, unknown>): void;
+  public log(message: string | Record<string, unknown>): void {
+    this.callFunction('info', message);
   }
 
   /**
-   * Output error log
+   * Output info log
    *
    * @param message
    */
-  error(message: string): void;
-  error(message: Record<string, unknown>): void;
-  error(message: Error): void;
-  error(message: string | Record<string, unknown> | Error): void {
+  public info(message: string): void;
+  public info(message: Record<string, unknown>): void;
+  public info(message: string | Record<string, unknown>): void {
+    this.callFunction('info', message);
+  }
+
+  /**
+   * Output warn log
+   *
+   * @param message
+   */
+  public error(message: string): void;
+  public error(message: Error): void;
+  public error(message: Record<string, unknown>): void;
+  public error(message: string | Error | Record<string, unknown>): void {
     if (message instanceof Error) {
-      const error = message;
-      this.callFunction('error', { msg: error.message, stack: error.stack });
+      this.callFunction('error', {
+        message: message.toString(),
+        stack: message.stack,
+      });
     } else {
       this.callFunction('error', message);
     }
@@ -62,9 +79,9 @@ export class LoggerService implements NestLoggerService {
    *
    * @param message
    */
-  warn(message: string): void;
-  warn(message: Record<string, unknown>): void;
-  warn(message: string | Record<string, unknown>): void {
+  public warn(message: string): void;
+  public warn(message: Record<string, unknown>): void;
+  public warn(message: string | Record<string, unknown>): void {
     this.callFunction('warn', message);
   }
 
@@ -73,9 +90,9 @@ export class LoggerService implements NestLoggerService {
    *
    * @param message
    */
-  debug(message: string): void;
-  debug(message: Record<string, unknown>): void;
-  debug(message: string | Record<string, unknown>): void {
+  public debug(message: string): void;
+  public debug(message: Record<string, unknown>): void;
+  public debug(message: string | Record<string, unknown>): void {
     this.callFunction('debug', message);
   }
 
@@ -84,25 +101,26 @@ export class LoggerService implements NestLoggerService {
    *
    * @param message
    */
-  verbose(message: string): void;
-  verbose(message: Record<string, unknown>): void;
-  verbose(message: string | Record<string, unknown>): void {
+  public verbose(message: string): void;
+  public verbose(message: Record<string, unknown>): void;
+  public verbose(message: string | Record<string, unknown>): void {
     this.callFunction('verbose', message);
   }
 
   /**
-   * Return pino instance
+   * Create child logger
+   *
+   * @param meta
    */
-  getLogger(): Logger {
-    return this.logger;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public child(meta: Object): LoggerService {
+    return new LoggerService(this.option, this.logger.child(meta));
   }
 
   /**
-   * Return a child logger with cotext in bindings
-   *
-   * @param context
+   * Return winston instance
    */
-  setContext(context: string): Logger {
-    return this.logger.child({ context });
+  public getLogger(): Logger {
+    return this.logger;
   }
 }
