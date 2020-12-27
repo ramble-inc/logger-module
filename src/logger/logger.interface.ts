@@ -13,6 +13,14 @@ export interface ColorSchema {
 }
 
 /**
+ * Type for winston metadata
+ */
+export interface WinstonMetadata {
+  context: string;
+  [key: string]: string;
+}
+
+/**
  * Type for NestJS formatter option
  */
 export interface NestJsFormatterOption {
@@ -26,6 +34,7 @@ export interface NestJsFormatterOption {
 export interface NestJsFormatInfo extends TransformableInfo {
   context: string;
   stack?: string;
+  isObject: boolean;
 }
 
 /**

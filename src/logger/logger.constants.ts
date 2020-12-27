@@ -1,11 +1,24 @@
 import { clc } from '@nestjs/common/utils/cli-colors.util';
-import { transports, LoggerOptions, format } from 'winston';
-import { nestJs } from '@/logger/logger.util';
 
 /**
  * Provider token for global logger
  */
 export const APP_LOGGER = 'APP_LOGGER';
+
+/**
+ * Provider token for winston instance
+ */
+export const WINSTON_LOGGER = 'WINSTON_LOGGER';
+
+/**
+ * Default context
+ */
+export const DEFAULT_CONTEXT = 'LoggerService';
+
+/**
+ * Symbol for isObject in NestJsFormatInfo
+ */
+export const IS_OBJECT_SYMBOL = Symbol('isObject');
 
 /**
  * Option for Date.prototype.toLocaleString
@@ -41,27 +54,4 @@ export const NEST_COLOR_SCHEMA = {
   warn: clc.yellow,
   debug: clc.magentaBright,
   verbose: clc.cyanBright,
-};
-
-/**
- * Winston option for development
- */
-export const devOption: LoggerOptions = {
-  levels: NEST_LOG_LEVEL,
-  level: 'verbose',
-  transports: [
-    new transports.Console({
-      format: format.combine(nestJs({ colorSchema: NEST_COLOR_SCHEMA })),
-    }),
-  ],
-};
-
-/**
- * Winston option for production
- */
-export const prodOption: LoggerOptions = {
-  levels: NEST_LOG_LEVEL,
-  level: 'error',
-  format: format.json(),
-  transports: [new transports.Console()],
 };

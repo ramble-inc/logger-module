@@ -1,3 +1,4 @@
+export * from '@/logger/logger.config';
 export * from '@/logger/logger.constants';
 export * from '@/logger/logger.interceptor';
 export * from '@/logger/logger.interface';
