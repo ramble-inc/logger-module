@@ -1,6 +1,9 @@
 {
-  "debug.node.autoAttach": "on",
+  "debug.javascript.autoAttachFilter": "onlyWithFlag",
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
+  },
+  "files.associations": {
+    "**/tsconfig.json": "jsonc"
   }
 }
