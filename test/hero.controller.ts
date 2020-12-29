@@ -1,5 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { Observable, Subject } from 'rxjs';
+import { LogIncomingMessage } from '@/logger/logger.decorator';
+import { LoggerService } from '@/logger/logger.service';
 import {
   Hero,
   HeroById,
@@ -22,6 +24,7 @@ export class HeroController implements HeroServiceController {
     return item;
   }
 
+  @LogIncomingMessage(LoggerService)
   clientStreamAsObservable(data$: Observable<HeroById>): Observable<Hero> {
     const hero$ = new Subject<Hero>();
 
@@ -73,6 +76,7 @@ export class HeroController implements HeroServiceController {
     return subject.asObservable();
   }
 
+  @LogIncomingMessage(LoggerService)
   bidirectionalStreamAsObservable(
     data$: Observable<HeroById>,
   ): Observable<Hero> {

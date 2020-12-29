@@ -38,6 +38,13 @@ export interface NestJsFormatInfo extends TransformableInfo {
 }
 
 /**
+ * Type for NestFormatInfo
+ */
+export interface LoggingInterceptorOption {
+  logOutgoingMessage: boolean;
+}
+
+/**
  * Type for meta info in message.
  * Comes as the 2nd item of ExecutionContext.getArgs().
  */

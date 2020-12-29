@@ -7,6 +7,7 @@ import { LoggerService } from '@/logger/logger.service';
 export class LoggerModule {
   public static forRoot(option: LoggerOptions): DynamicModule {
     return {
+      global: true,
       module: LoggerModule,
       providers: [
         {

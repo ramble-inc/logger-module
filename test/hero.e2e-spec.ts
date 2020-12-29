@@ -44,7 +44,11 @@ describe('HeroController (E2E)', () => {
       },
     });
 
-    app.useGlobalInterceptors(new LoggingInterceptor(app.get(LoggerService)));
+    app.useGlobalInterceptors(
+      new LoggingInterceptor(app.get(LoggerService), {
+        logOutgoingMessage: true,
+      }),
+    );
     await app.listenAsync();
 
     const proto = await ProtoLoader.load(

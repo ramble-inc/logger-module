@@ -1,59 +1,101 @@
-import type { Logger } from 'winston';
+import { Observable } from 'rxjs';
 import { LoggingInterceptor } from '@/logger/logger.interceptor';
-import { LoggerService } from '@/logger/logger.service';
 import {
-  mockCallHandler,
-  mockExecutionContext,
-  mockLogger,
-  mockRpcArgumentsHost,
+  createMockCallHandler,
+  createMockExecutionContext,
+  createMockRpcArgumentsHost,
 } from '@/logger/logger.jest';
 
 describe('LoggingInterceptor', () => {
-  let interceptor: LoggingInterceptor;
+  let mockLoggerService;
+  let mockCallHandler;
+  let mockExecutionContext;
+  let mockRpcArgumentsHost;
+  const data = { data: 'data' };
+  const userAgent = 'ios';
+  const className = 'SomeClass';
+  const methodName = 'SomeMethod';
+  const res = { mock: 'mock' };
+  const observable$ = new Observable((subscriber) => {
+    subscriber.next(res);
+  });
 
   beforeAll(() => {
-    const loggerService = new LoggerService((mockLogger as unknown) as Logger);
-    interceptor = new LoggingInterceptor(loggerService);
+    mockLoggerService = {
+      info: jest.fn(),
+    };
+    mockCallHandler = createMockCallHandler();
+    mockExecutionContext = createMockExecutionContext();
+    mockRpcArgumentsHost = createMockRpcArgumentsHost();
+
+    mockRpcArgumentsHost.getContext.mockReturnValue({
+      _internal_repr: {
+        'user-agent': userAgent,
+      },
+    });
+    mockRpcArgumentsHost.getData.mockReturnValue(data);
+    mockExecutionContext.getClass.mockReturnValue({
+      name: className,
+    });
+    mockExecutionContext.getHandler.mockReturnValue({
+      name: methodName,
+    });
+    mockExecutionContext.switchToRpc.mockReturnValue(mockRpcArgumentsHost);
+    mockCallHandler.handle.mockReturnValue(observable$);
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('intercept', () => {
-    it('should call getClass, getHandler, and getArgByIndex', () => {
-      const spyGetData = jest
-        .spyOn(mockRpcArgumentsHost, 'getData')
-        .mockReturnValueOnce({ data: 'data' });
-      const spyGetContext = jest
-        .spyOn(mockRpcArgumentsHost, 'getContext')
-        .mockReturnValueOnce({
-          _internal_repr: {
-            'user-agent': 'ios',
-          },
-        });
-      const spyGetClass = jest
-        .spyOn(mockExecutionContext, 'getClass')
-        .mockReturnValueOnce({ name: 'SomeClass' });
-      const spyGetHandler = jest
-        .spyOn(mockExecutionContext, 'getHandler')
-        .mockReturnValueOnce({ name: 'SomeMethod' });
-      const spySwitchToRpc = jest
-        .spyOn(mockExecutionContext, 'switchToRpc')
-        .mockReturnValueOnce(mockRpcArgumentsHost);
+    it('should call getClass, getHandler, switchToRpc, getData, getContext, and handle', () => {
+      const interceptor = new LoggingInterceptor(mockLoggerService);
 
-      const value = interceptor.intercept(
-        mockExecutionContext,
-        mockCallHandler,
-      );
+      interceptor
+        .intercept(mockExecutionContext, mockCallHandler)
+        .subscribe((v) => v);
 
-      expect(value).toBeUndefined();
+      expect(mockExecutionContext.getClass.mock.calls).toEqual([[]]);
+      expect(mockExecutionContext.getHandler.mock.calls).toEqual([[]]);
+      expect(mockExecutionContext.switchToRpc.mock.calls).toEqual([[]]);
+      expect(mockRpcArgumentsHost.getData.mock.calls).toEqual([[]]);
+      expect(mockRpcArgumentsHost.getContext.mock.calls).toEqual([[]]);
       expect(mockCallHandler.handle.mock.calls).toEqual([[]]);
-      expect(spyGetData.mock.calls).toEqual([[]]);
-      expect(spyGetContext.mock.calls).toEqual([[]]);
-      expect(spyGetClass.mock.calls).toEqual([[]]);
-      expect(spyGetHandler.mock.calls).toEqual([[]]);
-      expect(spySwitchToRpc.mock.calls).toEqual([[]]);
+    });
+
+    describe('logOutgoingMessage is true', () => {
+      it('should call logger.info twice', () => {
+        const interceptor = new LoggingInterceptor(mockLoggerService, {
+          logOutgoingMessage: true,
+        });
+
+        interceptor
+          .intercept(mockExecutionContext, mockCallHandler)
+          .subscribe((v) => v);
+
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        expect(mockLoggerService.info).toHaveBeenNthCalledWith(
+          2,
+          res,
+          `${className}.${methodName}`,
+        );
+      });
+    });
+
+    describe('logOutgoingMessage is false', () => {
+      it('should call logger.info once', () => {
+        const interceptor = new LoggingInterceptor(mockLoggerService, {
+          logOutgoingMessage: false,
+        });
+
+        interceptor
+          .intercept(mockExecutionContext, mockCallHandler)
+          .subscribe((v) => v);
+
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        expect(mockLoggerService.info).toHaveBeenCalledTimes(1);
+      });
     });
   });
 });

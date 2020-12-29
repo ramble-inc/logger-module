@@ -1,13 +1,15 @@
 import { Logger } from 'winston';
-import { mockLogger } from '@/logger/logger.jest';
+import { createMockLogger } from '@/logger/logger.jest';
 import { DEFAULT_CONTEXT, IS_OBJECT_SYMBOL } from '@/logger/logger.constants';
 import { LoggerService } from '@/logger/logger.service';
 
 describe('LoggerService', () => {
-  let service: LoggerService;
+  let mockLogger;
+  let service;
 
   beforeEach(() => {
-    service = new LoggerService((mockLogger as unknown) as Logger);
+    mockLogger = createMockLogger();
+    service = new LoggerService(mockLogger as Logger);
   });
 
   afterEach(() => {
@@ -15,16 +17,14 @@ describe('LoggerService', () => {
   });
 
   it('logger should have intended metadata', () => {
-    const logger = new LoggerService((mockLogger as unknown) as Logger);
-
-    expect(logger.getMetadata()).toEqual({
+    expect(service.getMetadata()).toEqual({
       context: DEFAULT_CONTEXT,
     });
 
     const context = 'some context';
-    logger.setContext(context);
+    service.setContext(context);
 
-    expect(logger.getMetadata()).toEqual({
+    expect(service.getMetadata()).toEqual({
       context,
     });
 
@@ -32,9 +32,9 @@ describe('LoggerService', () => {
       context: 'new context',
       somethingElse: 'something else',
     };
-    logger.setMetadata(metadata);
+    service.setMetadata(metadata);
 
-    expect(logger.getMetadata()).toEqual(metadata);
+    expect(service.getMetadata()).toEqual(metadata);
   });
 
   it.each([['info'], ['warn'], ['debug'], ['verbose']])(
